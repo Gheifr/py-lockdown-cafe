@@ -9,8 +9,18 @@ from app.errors import (NotVaccinatedError,
 class Vaccine:
     def __init__(self, data: dict = None) -> None:
         self.expiration = None
+        expiration_date = None
         if data:
-            self.expiration = data.get("expiration_date", None)
+            expiration_date  = data.get("expiration_date", None)
+            if isinstance(expiration_date, datetime.date):
+                self.expiration = expiration_date
+            elif isinstance(expiration_date, str):
+                try:
+                    self.expiration = datetime.datetime.strptime(expiration_date, "%Y-%m-%d").date()
+                except ValueError:
+                    raise ValueError(f"Invalid date format: {expiration_date}. Expected YYYY-MM-DD.")
+            else:
+                self.expiration = None
 
 
 class Person:
